@@ -1,0 +1,103 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: StyleSeek AI - Serverless NestJS API Gateway & Bedrock Lambda Infrastructure
+
+Parameters:
+  Environment:
+    Type: String
+    Default: production
+    AllowedValues:
+      - development
+      - staging
+      - production
+    Description: Environment stage name
+
+  BedrockModelId:
+    Type: String
+    Default: us.amazon.nova-lite-v1:0
+    Description: Amazon Nova model ID or inference profile identifier
+
+  AllowedOrigins:
+    Type: String
+    Default: '*'
+    Description: Allowed CORS origins for API Gateway
+
+Globals:
+  Function:
+    Timeout: 25
+    MemorySize: 512
+    Runtime: nodejs22.x
+    Architectures:
+      - x86_64
+
+Resources:
+  # HTTP API Gateway with throttling settings
+  StyleSeekHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: '$default'
+      CorsConfiguration:
+        AllowOrigins:
+          - !Ref AllowedOrigins
+        AllowHeaders:
+          - Content-Type
+          - X-Request-ID
+          - Authorization
+        AllowMethods:
+          - GET
+          - POST
+          - OPTIONS
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 20
+        ThrottlingRateLimit: 10
+      RouteSettings:
+        "POST /api/assistant/recommend":
+          ThrottlingBurstLimit: 5
+          ThrottlingRateLimit: 2
+
+  # NestJS Lambda Function
+  StyleSeekApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub styleseek-ai-api-${Environment}
+      Handler: lambda.handler
+      CodeUri: ../apps/api/dist
+      Description: NestJS Serverless API Handler for StyleSeek AI
+      Environment:
+        Variables:
+          NODE_ENV: !Ref Environment
+          BEDROCK_MODEL_ID: !Ref BedrockModelId
+          ALLOWED_ORIGINS: !Ref AllowedOrigins
+      Events:
+        RecommendApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /api/assistant/recommend
+            Method: POST
+            ApiId: !Ref StyleSeekHttpApi
+        ProxyApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+            ApiId: !Ref StyleSeekHttpApi
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+                - bedrock:GetInferenceProfile
+              Resource: "*"
+
+  # CloudWatch Log Group with 14-day retention limit
+  StyleSeekApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${StyleSeekApiFunction}
+      RetentionInDays: 14
+
+Outputs:
+  StyleSeekApiUrl:
+    Description: API Gateway Endpoint URL for StyleSeek AI
+    Value: !Sub https://${StyleSeekHttpApi}.execute-api.${AWS::Region}.amazonaws.com
