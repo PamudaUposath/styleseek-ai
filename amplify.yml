@@ -5,11 +5,11 @@ applications:
       phases:
         preBuild:
           commands:
-            - npm ci --prefix ../.. --no-audit --no-fund
+            - npm ci --prefix ../..
         build:
           commands:
-            - npm run build:shared --prefix ../..
-            - npm run build:web --prefix ../..
+            - npm run build --prefix ../../packages/shared
+            - npm run build --prefix .
       artifacts:
         baseDirectory: out
         files:
