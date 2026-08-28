@@ -49,9 +49,9 @@ describe('AssistantService', () => {
         const res = await assistantService.processRequest({
             message: 'Show me black T-shirts'
         });
-        expect(res.products.every(p => p.id !== 'FAKE-999')).toBe(true);
-        expect(res.products.every(p => p.id !== 'STY-027')).toBe(true);
-        expect(res.products.some(p => p.id === 'STY-001')).toBe(true);
+        expect(res.products.every((p) => p.id !== 'FAKE-999')).toBe(true);
+        expect(res.products.every((p) => p.id !== 'STY-027')).toBe(true);
+        expect(res.products.some((p) => p.id === 'STY-001')).toBe(true);
     });
     it('should handle prompt injection attempts safely without exposing secrets', async () => {
         jest.spyOn(bedrockService, 'getRecommendations').mockResolvedValue({
@@ -63,7 +63,7 @@ describe('AssistantService', () => {
         });
         expect(res.message).not.toContain('AWS_SECRET');
         expect(res.message).not.toContain('BEDROCK_MODEL');
-        expect(res.products.every(p => p.id !== 'NIKE-1')).toBe(true);
+        expect(res.products.every((p) => p.id !== 'NIKE-1')).toBe(true);
     });
 });
 //# sourceMappingURL=assistant.service.spec.js.map
