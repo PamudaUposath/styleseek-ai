@@ -13,6 +13,7 @@
     "target": "ES2021",
     "outDir": "./dist",
     "baseUrl": "./",
+    "types": [],
     "paths": {
       "@styleseek/shared": ["../../packages/shared/src/index.ts"],
       "@styleseek/shared/*": ["../../packages/shared/src/*"]
