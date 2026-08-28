@@ -5,7 +5,7 @@ applications:
       phases:
         preBuild:
           commands:
-            - npm ci --prefix ../..
+            - npm ci --prefix ../.. --no-audit --no-fund
         build:
           commands:
             - npm run build:shared --prefix ../..
