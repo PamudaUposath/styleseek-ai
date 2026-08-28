@@ -11,11 +11,12 @@
     "dev": "concurrently -n \"API,WEB\" -c \"cyan,magenta\" \"npm run dev:api\" \"npm run dev:web\"",
     "dev:web": "npm run dev --workspace=apps/web",
     "dev:api": "npm run start:dev --workspace=apps/api",
-    "build": "npm run build --workspace=packages/shared && npm run build --workspace=apps/api && npm run build --workspace=apps/web",
+    "build": "npm run build:shared && npm run build --workspace=apps/api && npm run build --workspace=apps/web",
+    "build:shared": "npm run build --workspace=packages/shared",
     "build:api": "npm run build --workspace=apps/api",
     "build:web": "npm run build --workspace=apps/web",
-    "test": "npm run test --workspace=apps/api",
-    "typecheck": "tsc -b tsconfig.base.json",
+    "test": "npm run build:shared && npm run test --workspace=apps/api",
+    "typecheck": "npm run build:shared && tsc -b tsconfig.base.json",
     "lint": "npx eslint apps/api/src apps/web/app apps/web/components apps/web/lib"
   },
   "keywords": [

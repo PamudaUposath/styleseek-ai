@@ -137,9 +137,9 @@ export class DeterministicFilterService {
     if (constraints.colour) {
       const c = constraints.colour.toLowerCase();
       candidates = candidates.filter(p =>
-        p.colours.some(col => col.toLowerCase().includes(c)) ||
+        p.colours.some((col: string) => col.toLowerCase().includes(c)) ||
         p.name.toLowerCase().includes(c) ||
-        p.tags.some(t => t.toLowerCase() === c)
+        p.tags.some((t: string) => t.toLowerCase() === c)
       );
     }
 

@@ -44,8 +44,8 @@ export class CatalogueService implements OnModuleInit {
       p =>
         p.name.toLowerCase().includes(q) ||
         p.category.toLowerCase().includes(q) ||
-        p.tags.some(t => t.toLowerCase().includes(q)) ||
-        p.colours.some(c => c.toLowerCase().includes(q))
+        p.tags.some((t: string) => t.toLowerCase().includes(q)) ||
+        p.colours.some((c: string) => c.toLowerCase().includes(q))
     );
   }
 

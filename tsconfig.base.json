@@ -4,6 +4,10 @@
     "jsx": "react-jsx",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "baseUrl": ".",
+    "paths": {
+      "@styleseek/shared": ["packages/shared/src/index.ts"]
+    },
     "declaration": true,
     "sourceMap": true,
     "composite": true,
