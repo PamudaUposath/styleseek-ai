@@ -51,6 +51,9 @@
       "ts"
     ],
     "rootDir": ".",
+    "moduleNameMapper": {
+      "^@styleseek/shared$": "<rootDir>/../../packages/shared/src"
+    },
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
