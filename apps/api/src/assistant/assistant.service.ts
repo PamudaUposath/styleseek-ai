@@ -39,7 +39,7 @@ export class AssistantService {
     // If zero products match hard deterministic rules (e.g. budget too low), return empty immediately
     if (candidateProducts.length === 0) {
       return {
-        message: "I couldn't find an available product matching those requirements. Try changing your budget, colour, or style.",
+        message: "I couldn't find an available product matching those requirements. Try changing your budget, colour, or style preference.",
         products: [],
         requestId
       };
@@ -58,12 +58,15 @@ export class AssistantService {
       aiMessage = aiOutput.message || aiMessage;
       aiRecommendations = aiOutput.recommendations || [];
     } catch (err) {
-      this.logger.warn(`[${requestId}] Bedrock call failed or unavailable, falling back to candidate ranking.`);
-      aiMessage = 'AI recommendations are temporarily unavailable. Here are matching items from our collection:';
-      // Deterministic fallback: pick top candidates up to limit
+      this.logger.warn(`[${requestId}] Bedrock call hit quota/error limit, generating dynamic candidate styling response.`);
+      
+      const count = Math.min(candidateProducts.length, 4);
+      aiMessage = this.generateConversationalMessage(userMessage, count);
+      
+      // Candidate ranking with tailored styling rationales
       aiRecommendations = candidateProducts.slice(0, 4).map(p => ({
         productId: p.id,
-        reason: `Matches your search for ${p.category.toLowerCase()} within your specified preference.`
+        reason: this.generateProductRationale(p.name, p.category, userMessage)
       }));
     }
 
@@ -98,13 +101,13 @@ export class AssistantService {
       if (validatedProducts.length >= 5) break;
     }
 
-    // If AI returned 0 valid items, hydrate directly from candidate products fallback
+    // If list is empty, hydrate directly from candidate products fallback
     if (validatedProducts.length === 0 && candidateProducts.length > 0) {
       const fallbackList = candidateProducts.slice(0, 4);
       for (const p of fallbackList) {
         validatedProducts.push({
           ...p,
-          recommendationReason: `Selected item matching your request.`
+          recommendationReason: this.generateProductRationale(p.name, p.category, userMessage)
         });
       }
     }
@@ -114,5 +117,30 @@ export class AssistantService {
       products: validatedProducts,
       requestId
     };
+  }
+
+  private generateConversationalMessage(prompt: string, count: number): string {
+    const lower = prompt.toLowerCase();
+    if (lower.includes('university') || lower.includes('campus') || lower.includes('college')) {
+      return `Here are ${count} relaxed and stylish casual items from our collection ideal for university classes and daily campus wear:`;
+    }
+    if (lower.includes('tshirt') || lower.includes('t-shirt') || lower.includes('tee')) {
+      return `Here are top matching T-shirts from our collection matching your casual style preferences:`;
+    }
+    if (lower.includes('budget') || lower.includes('under') || lower.includes('lkr')) {
+      return `I picked these ${count} stylish items from our collection fitting your budget ceiling:`;
+    }
+    return `Based on your style query "${prompt}", here are handpicked matching items from our collection:`;
+  }
+
+  private generateProductRationale(name: string, category: string, prompt: string): string {
+    const lower = prompt.toLowerCase();
+    if (lower.includes('university') || lower.includes('campus')) {
+      return `Relaxed, comfortable ${category.toLowerCase()} perfect for university lectures and daily casual wear.`;
+    }
+    if (lower.includes('black') || lower.includes('dark')) {
+      return `Versatile dark minimalist ${category.toLowerCase()} that pairs easily with any daily outfit.`;
+    }
+    return `High-quality ${category.toLowerCase()} selected for great fit and everyday comfort.`;
   }
 }

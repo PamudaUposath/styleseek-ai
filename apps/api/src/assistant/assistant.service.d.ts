@@ -9,4 +9,6 @@ export declare class AssistantService {
     private readonly logger;
     constructor(catalogueService: CatalogueService, filterService: DeterministicFilterService, bedrockService: BedrockService);
     processRequest(dto: RecommendRequest, requestId?: string): Promise<RecommendResponse>;
+    private generateConversationalMessage;
+    private generateProductRationale;
 }

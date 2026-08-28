@@ -8,7 +8,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev:api & npm run dev:web",
+    "dev": "concurrently -n \"API,WEB\" -c \"cyan,magenta\" \"npm run dev:api\" \"npm run dev:web\"",
     "dev:web": "npm run dev --workspace=apps/web",
     "dev:api": "npm run start:dev --workspace=apps/api",
     "build": "npm run build --workspace=packages/shared && npm run build --workspace=apps/api && npm run build --workspace=apps/web",
@@ -30,6 +30,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "concurrently": "^10.0.5",
     "esbuild": "^0.28.2",
     "typescript": "^5.4.5"
   }

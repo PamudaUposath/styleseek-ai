@@ -4,7 +4,6 @@ import { Hero } from '../components/Hero';
 import { ChatInterface } from '../components/ChatInterface';
 import { FeaturedProducts } from '../components/FeaturedProducts';
 import { HowItWorks } from '../components/HowItWorks';
-import { ArchitectureSection } from '../components/ArchitectureSection';
 import { Footer } from '../components/Footer';
 
 export default function HomePage() {
@@ -16,7 +15,6 @@ export default function HomePage() {
         <ChatInterface />
         <FeaturedProducts />
         <HowItWorks />
-        <ArchitectureSection />
       </main>
       <Footer />
     </div>
